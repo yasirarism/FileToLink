@@ -8,15 +8,18 @@ from FileToLink import bot, Config, Strings
 async def archive_msg(msg: Message):
     buttons = [[InlineKeyboardButton("🚫", callback_data='delete-file')]]
 
-    forward = msg.forward_from or msg.forward_from_chat
-    if forward:
+    if forward := msg.forward_from or msg.forward_from_chat:
         if forward.username:
             buttons[0].append(InlineKeyboardButton("↪", url=f'https://t.me/{forward.username}'))
         else:
             if hasattr(forward, 'title') and forward.title is not None:
                 name = forward.title
             else:
-                name = forward.first_name + f' {forward.last_name}' if forward.last_name else forward.first_name
+                name = (
+                    f'{forward.first_name} {forward.last_name}'
+                    if forward.last_name
+                    else forward.first_name
+                )
             if len(name) >= (64 - len('from|')):
                 name = name[:(64 - len('from|'))]
             buttons[0].append(InlineKeyboardButton("↪", callback_data=f'from|{name}'))
@@ -38,7 +41,11 @@ async def archive_msg(msg: Message):
 @bot.on_callback_query(filters.create(lambda _, __, cb: cb.data.split('|')[0] == 'user'))
 async def user_info(_, cb: CallbackQuery):
     user: User = await bot.get_users(int(cb.data.split('|')[1]))
-    name = user.first_name + f' {user.last_name}' if user.last_name else user.first_name
+    name = (
+        f'{user.first_name} {user.last_name}'
+        if user.last_name
+        else user.first_name
+    )
     await cb.answer(f'Name: {name}\nID: {user.id}', show_alert=True)
 
 

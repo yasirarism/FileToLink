@@ -101,7 +101,7 @@ async def keep_awake(sleep_time=20 * 60):
     """
     while True:
         async with ClientSession() as session:
-            async with session.get(Config.Link_Root + "keep_awake"):
+            async with session.get(f"{Config.Link_Root}keep_awake"):
                 pass
         await sleep(sleep_time)
 

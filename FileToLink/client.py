@@ -190,11 +190,7 @@ class TelegramClient(Client):
         else:
             media = message
 
-        if isinstance(media, str):
-            file_id_str = media
-        else:
-            file_id_str = media.file_id
-
+        file_id_str = media if isinstance(media, str) else media.file_id
         file_id_obj = FileId.decode(file_id_str)
 
         file_type = file_id_obj.file_type
@@ -226,11 +222,7 @@ class TelegramClient(Client):
             else:
                 extension = ".unknown"
 
-            file_name = "{}_{}{}".format(
-                FileType(file_id_obj.file_type).name.lower(),
-                media.file_unique_id,
-                extension
-            )
+            file_name = f"{FileType(file_id_obj.file_type).name.lower()}_{media.file_unique_id}{extension}"
 
         file_path = os.path.join(directory, file_name)
         if not os.path.isfile(file_path):
@@ -238,16 +230,14 @@ class TelegramClient(Client):
                 await f.seek((file_size - 1) if file_size != 0 else 0)
                 await f.write(b'\0')
 
-        rng = await self.get_part_file(
+        return await self.get_part_file(
             file_id=file_id_obj,
             file_path=file_path,
             file_size=file_size,
             start=start,
             stop=stop,
-            limit=limit
+            limit=limit,
         )
-
-        return rng
 
 
 bot = TelegramClient(Config.Session, api_id=Config.API_ID, api_hash=Config.API_HASH,

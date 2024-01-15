@@ -48,8 +48,10 @@ class Worker:
         self.link = f'{Config.Link_Root}dl/{self.archive_id}/{quote(self.name)}'
 
         if self.mime_type:
-            self.stream = (bool(self.mime_type.split('/')[0] in ('video', 'audio')) or
-                           bool(self.mime_type.split('/')[1] in ('pdf', 'jpg', 'jpeg', 'png')))
+            self.stream = self.mime_type.split('/')[0] in (
+                'video',
+                'audio',
+            ) or self.mime_type.split('/')[1] in ('pdf', 'jpg', 'jpeg', 'png')
         else:
             self.stream = False
 
